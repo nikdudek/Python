@@ -1,0 +1,45 @@
+#serwer
+from datetime import datetime
+import socket
+
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.bind(("localhost", 1769))
+s.listen(5)
+
+while True:
+    client, addr = s.accept()
+    print("Connected: " + addr[0])
+
+    while True:
+        data = client.recv(1024)
+        if not data:
+            break;
+	
+        print ('I receive = ' + data.decode('utf'8'))
+	       now = datetime.now()
+	       curr_time = now.strftime("%H:%M:%S")
+	       time_data = ("Current Time =", curr_time)
+        client.send(time_data.encode('utf-8'))
+    
+    client.close()
+
+s.close()
+
+--------------------------
+#klient
+import socket
+import sys
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    s.connect(('localhost', 1769))
+    while True:
+        data = input("Podaj dane: ")
+        s.send(data.encode('utf-8'))
+        data = s.recv(1024)
+        if not data:
+            break
+        print ('Response:' + data.decode('utf-8'))
+    s.close()
+except socket.error:
+    print ('Error')
